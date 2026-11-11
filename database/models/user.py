@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from database.database import Base
+from . import Base
 
 
 # User describes the users table.

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 
-from database.database import Base
+from . import Base
 
 
 class Post(Base):
