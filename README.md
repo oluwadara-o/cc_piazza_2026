@@ -17,3 +17,9 @@ Testing:
 ```shell
 python -m pytest
 ```
+
+(from homework 4)
+Generate and set a (32 character) JWT_SECRET to hash your password. Keep this token secret and do not share it If you lose it, users will not be able to log in.
+
+python -c "import secrets; print(secrets.token_hex(32))"
+$env:JWT_SECRET = "paste-your-generated-value-here"
