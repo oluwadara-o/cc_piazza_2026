@@ -7,7 +7,7 @@ class Post(Base):
     __tablename__ = "posts"
 
     post_id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, foiegn_key=User.username, nullable=False)
+    username = Column(String, ForeignKey(User.username), nullable=False)
 
     title = Column(String, nullable=False)
     message = Column(String, nullable=False)
