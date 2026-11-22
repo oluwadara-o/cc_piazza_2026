@@ -32,3 +32,25 @@ def client(tmp_path):
     finally:
         app.dependency_overrides.clear()
         engine.dispose()
+
+@pytest.fixture
+def client_db(tmp_path):
+    """Fixture to give access to the database"""
+    engine = create_engine(
+        f"sqlite:///{tmp_path / 'auth-test.db'}",
+        connect_args={"check_same_thread": False},
+    )
+    sessions = sessionmaker(bind=engine)
+    app = create_app(engine)
+
+    def override_db():
+        with sessions() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_db
+    try:
+        with TestClient(app) as test_client:
+            yield test_client, override_db
+    finally:
+        app.dependency_overrides.clear()
+        engine.dispose()

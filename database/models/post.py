@@ -10,6 +10,6 @@ class Post(Base):
     username = Column(String, ForeignKey(User.username), nullable=False)
 
     title = Column(String, nullable=False)
-    message = Column(String, nullable=False)
+    body = Column(String, nullable=False)
     creation_ts = Column(String, nullable=False)
     expiration_ts = Column(String, nullable=False)
