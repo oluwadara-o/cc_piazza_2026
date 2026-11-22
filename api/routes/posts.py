@@ -14,7 +14,7 @@ router = APIRouter()
 
 # def get_profile(current_user: models.User = Depends(get_current_user)):
 
-@router.post("/post", status_code=201)
+@router.post("/post", response_model=schemas.PostCreateResponse, status_code=201)
 def create_post(post: schemas.PostCreate,
                 current_user: models.User = Depends(get_current_user),
                                 db: Session = Depends(get_db)):
@@ -28,39 +28,21 @@ def create_post(post: schemas.PostCreate,
         username=current_user.username,
     )
     db.add(db_post)
-    print(db_post.post_id)
+
     db.flush()
+    topic_list = []
     for topic in post.topics:
-        print(topic)
         db_topics = models.Topic(
             topic_name=topic,
             post_id=db_post.post_id,
         )
         db.add(db_topics)
-    db.commit()
+        topic_list.append(db_topics.topic_name)
 
-    # try:
-    #     db.flush()
-    #     for topic in post.topics:
-    #         print(topic)
-    #         db_topics = models.Topic(
-    #             topic_name=topic,
-    #             post_id=db_post.post_id,
-    #         )
-    #         db.add(db_topics)
-    #     db.commit()
-    # except Exception as e:
-    #     db.rollback()
-
-    print("done")
-    print(db.query(models.Topic).first().topic_name)
-    # TODO add to topics
-    # try:
-    #     db.commit()
-    # except IntegrityError as e:
-    #     print(e)
-    #     db.rollback()
-    #     raise HTTPException(status_code=409, detail="Issue adding post")
     db.commit()
     db.refresh(db_post)
-    return db_post
+    return {"title": db_post.title,
+             "topics": topic_list,
+             "expires_at": db_post.expiration_ts,
+             "username": current_user.username
+             }

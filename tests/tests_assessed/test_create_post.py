@@ -1,4 +1,5 @@
 """
+TC03	Olga’s request without a token is rejected
 TC04	Olga creates a Tech post with an expiry timestamp
 TC05	Nick creates another Tech post
 TC06	Mary creates another Tech post
@@ -8,27 +9,24 @@ from datetime import datetime, timedelta
 
 import database.models as models
 from database import get_db
-from test_required import all_four_login, all_four_register, OLGA
+from test_auth import all_four_login, all_four_register, OLGA, NICK, MARY
 
 olga_post = {"title": "The Importance of AI",
              "body": "AvecVou",
              "topics": ["Tech"],
              "expires_at": datetime.strftime(datetime.now() + timedelta(hours=24), "%Y-%m-%d %H:%M:%S"),
-             "username": OLGA["username"]
              }
 
 nick_post = {"title": "HPC Moredenisation",
              "body": "AvecVou",
              "topics": ["Tech"],
              "expires_at": datetime.strftime(datetime.now() + timedelta(hours=24), "%Y-%m-%d %H:%M:%S"),
-             "username": OLGA["username"]
              }
 
 mary_post = {"title": "BDT optiomisations at the LHC",
              "body": "AvecVou",
              "topics": ["Tech", "Physics"],
              "expires_at": datetime.strftime(datetime.now() + timedelta(hours=24), "%Y-%m-%d %H:%M:%S"),
-             "username": OLGA["username"]
              }
 
 
@@ -87,11 +85,13 @@ def test_tc05_06(client_db, all_four_login):
     assert nick_post_r.status_code == 201
     assert mary_post_r.status_code == 201
     assert olga_post_r.status_code == 201
+    assert nick_post_r.json()["username"] == NICK["username"]
+    assert mary_post_r.json()["username"] == MARY["username"]
 
     db = next(db_gen_func())
 
-    print(db.query(models.Topic).first().topic_name)
-    posts = db.query(models.Topic).filter(models.Topic.topic_name == "Tech").all()
-    for post in posts:
-        print(post.post_id)
-        print(db.query(models.Post).filter(models.Post.post_id == post.post_id).first().title)
+    # print(db.query(models.Topic).first().topic_name)
+    # posts = db.query(models.Topic).filter(models.Topic.topic_name == "Tech").all()
+    # for post in posts:
+    #     print(post.post_id)
+    #     print(db.query(models.Post).filter(models.Post.post_id == post.post_id).first().title)

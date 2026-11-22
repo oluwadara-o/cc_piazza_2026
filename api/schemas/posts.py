@@ -10,4 +10,9 @@ class PostCreate(BaseModel):
     body: str = Field(min_length=3, max_length=500)
     topics: Optional[List[str]] = Field(default=[])
     expires_at: datetime
+
+class PostCreateResponse(BaseModel):
+    title: str = Field(min_length=3, max_length=500)
+    topics: List[str] = Field(default=[])
+    expires_at: datetime
     username: str

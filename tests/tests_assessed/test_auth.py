@@ -1,11 +1,6 @@
 """
 TC01	Olga, Nick, Mary and Nestor register successfully
 TC02	All four users log in and receive tokens
-TC03	Olga’s request without a token is rejected
-TC04	Olga creates a Tech post with an expiry timestamp
-TC05	Nick creates another Tech post
-TC06	Mary creates another Tech post
-TC07	Tech browsing returns three posts with no initial reactions or comments
 """
 import pytest
 
