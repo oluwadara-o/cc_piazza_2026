@@ -1,4 +1,6 @@
 """Copied from class 4 TODO: Update"""
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
@@ -11,7 +13,8 @@ class UserCreate(BaseModel):
 
 # Request body for login.
 class UserLogin(BaseModel):
-    email: EmailStr
+    username: Optional[str] = Field(min_length=3, max_length=50, default=None)
+    email: Optional[EmailStr] = Field(default=None)
     password: str
 
 

@@ -32,7 +32,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Email already registered")
+        raise HTTPException(status_code=409, detail="Username/Email already registered")
     db.refresh(db_user)
     return db_user
 
@@ -40,7 +40,13 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", response_model=schemas.TokenResponse)
 def login(user_login: schemas.UserLogin, db: Session = Depends(get_db)):
     # Find the user by email.
-    user = db.query(models.User).filter(models.User.email == user_login.email).first()
+    if user_login.email:
+        user = db.query(models.User).filter(models.User.email == user_login.email).first()
+    # Find the user by username
+    elif user_login.username:
+        user = db.query(models.User).filter(models.User.username == user_login.username).first()
+    else:
+        raise HTTPException(status_code=400, detail="Username or Email are required")
 
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid email or password")
