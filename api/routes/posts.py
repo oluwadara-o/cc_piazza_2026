@@ -41,7 +41,8 @@ def create_post(post: schemas.PostCreate,
 
     db.commit()
     db.refresh(db_post)
-    return {"title": db_post.title,
+    return {"post_id": db_post.post_id,
+            "title": db_post.title,
              "topics": topic_list,
              "expires_at": db_post.expiration_ts,
              "username": current_user.username
@@ -63,9 +64,17 @@ def browse_post(topic: str,
             print(post.post_id)
             post_query = db.query(models.Post).filter(models.Post.post_id == post.post_id).first()
             print(post_query)
-            posts_to_return.append({"title": post_query.title,
-             "body": post_query.body,
-             "expiration_ts": post_query.expiration_ts,})
+            reactions_query = (db.query(models.Reaction.reaction_type)
+                               .join(models.Post, models.Reaction.post_id == models.Post.post_id))
+            likes_count = reactions_query.filter(models.Reaction.reaction_type == "like").count()
+            dislikes_count = reactions_query.filter(models.Reaction.reaction_type == "dislike").count()
+            posts_to_return.append({
+                "title": post_query.title,
+                "body": post_query.body,
+                "expiration_ts": post_query.expiration_ts,
+                "like_count": likes_count,
+                "dislike_count": dislikes_count,
+            })
     else:
         posts = db.query(models.Post).all()
 

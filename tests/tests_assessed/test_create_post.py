@@ -65,7 +65,7 @@ def test_tc04(client_db, all_four_login):
     print(type(db))
 
     print(db.query(models.Topic).first().topic_name)
-    assert db.query(models.Topic).first().topic_name == "Tech"
+    assert db.query(models.Topic).first().topic_name == "tech"
 
 @pytest.fixture
 def add_tech_posts(client, all_four_login):

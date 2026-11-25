@@ -12,6 +12,7 @@ class PostCreate(BaseModel):
     expires_at: datetime
 
 class PostCreateResponse(BaseModel):
+    post_id: int
     title: str = Field(min_length=3, max_length=500)
     topics: List[str] = Field(default=[])
     expires_at: datetime
