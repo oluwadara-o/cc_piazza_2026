@@ -33,7 +33,7 @@ def create_post(post: schemas.PostCreate,
     topic_list = []
     for topic in post.topics:
         db_topics = models.Topic(
-            topic_name=topic,
+            topic_name=topic.lower(),
             post_id=db_post.post_id,
         )
         db.add(db_topics)
@@ -46,3 +46,29 @@ def create_post(post: schemas.PostCreate,
              "expires_at": db_post.expiration_ts,
              "username": current_user.username
              }
+
+#TODO debug/define response model PostBrowseResponse
+@router.get("/post/topic/{topic}")
+def browse_post(topic: str,
+                current_user: models.User = Depends(get_current_user),
+                                db: Session = Depends(get_db)):
+    # Create a database user.
+    # The password is hashed before it is stored.
+    if topic:
+        print(db.query(models.Topic).first().topic_name)
+        print(topic)
+        posts = db.query(models.Topic).filter(models.Topic.topic_name == topic).all()
+        posts_to_return = []
+        for post in posts:
+            print(post.post_id)
+            post_query = db.query(models.Post).filter(models.Post.post_id == post.post_id).first()
+            print(post_query)
+            posts_to_return.append({"title": post_query.title,
+             "body": post_query.body,
+             "expiration_ts": post_query.expiration_ts,})
+    else:
+        posts = db.query(models.Post).all()
+
+    return posts_to_return
+
+

@@ -7,6 +7,8 @@ TC06	Mary creates another Tech post
 
 from datetime import datetime, timedelta
 
+import pytest
+
 import database.models as models
 from database import get_db
 from test_auth import all_four_login, all_four_register, OLGA, NICK, MARY
@@ -65,22 +67,45 @@ def test_tc04(client_db, all_four_login):
     print(db.query(models.Topic).first().topic_name)
     assert db.query(models.Topic).first().topic_name == "Tech"
 
-def test_tc05_06(client_db, all_four_login):
+@pytest.fixture
+def add_tech_posts(client, all_four_login):
+    olga_token, nick_token, mary_token, nest_token = [login.json()["access_token"] for login in all_four_login]
+    olga_post_r = client.post("piazza_posts/post",
+                              headers={"Authorization": f"Bearer {olga_token}"},
+                              json=olga_post
+                              )
+    nick_post_r = client.post("piazza_posts/post",
+                              headers={"Authorization": f"Bearer {nick_token}"},
+                              json=nick_post
+                              )
+    mary_post_r = client.post("piazza_posts/post",
+                              headers={"Authorization": f"Bearer {mary_token}"},
+                              json=mary_post
+                              )
+    return olga_post_r, nick_post_r, mary_post_r
+    # olga_login = client.post("/auth/login", json={"username":OLGA["username"], "password":OLGA["password"]})
+    # nick_login = client.post("/auth/login", json={"username":NICK["username"], "password":NICK["password"]})
+    # mary_login = client.post("/auth/login", json={"username":MARY["username"], "password":MARY["password"]})
+    # nestor_login = client.post("/auth/login", json = {"username": NESTOR["username"], "password": NESTOR["password"]})
+    # return olga_login, nick_login, mary_login, nestor_login
+
+def test_tc05_06(client_db, add_tech_posts):
     client, db_gen_func = client_db
 
-    olga_token, nick_token, mary_token, nest_token = [login.json()["access_token"] for login  in all_four_login]
-    olga_post_r = client.post("piazza_posts/post",
-                          headers={"Authorization": f"Bearer {olga_token}"},
-                          json=olga_post
-                          )
-    nick_post_r = client.post("piazza_posts/post",
-                          headers={"Authorization": f"Bearer {nick_token}"},
-                          json=nick_post
-                          )
-    mary_post_r = client.post("piazza_posts/post",
-                          headers={"Authorization": f"Bearer {mary_token}"},
-                          json=mary_post
-                          )
+    # olga_token, nick_token, mary_token, nest_token = [login.json()["access_token"] for login  in all_four_login]
+    # olga_post_r = client.post("piazza_posts/post",
+    #                       headers={"Authorization": f"Bearer {olga_token}"},
+    #                       json=olga_post
+    #                       )
+    # nick_post_r = client.post("piazza_posts/post",
+    #                       headers={"Authorization": f"Bearer {nick_token}"},
+    #                       json=nick_post
+    #                       )
+    # mary_post_r = client.post("piazza_posts/post",
+    #                       headers={"Authorization": f"Bearer {mary_token}"},
+    #                       json=mary_post
+    #                       )
+    olga_post_r, nick_post_r, mary_post_r = add_tech_posts
 
     assert nick_post_r.status_code == 201
     assert mary_post_r.status_code == 201
